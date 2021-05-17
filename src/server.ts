@@ -60,6 +60,13 @@ app.put('/bin/status/:id', jsonParser, (req, res) => {
 		.catch(error => res.status(400).json({ error }))
 })
 
+app.put('/bin/detail/:id', jsonParser, (req, res) => {
+	const binId = req.params && req.params['id']
+	hub.updateBinTags(binId, req.body as BinConfig)
+		.then(() => res.json({ success: true }))
+		.catch(error => res.status(400).json({ error }))
+})
+
 app.listen(port, () => {
 	console.log(`Server is listening at http://localhost:${port}`)
 })

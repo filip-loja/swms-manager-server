@@ -29,10 +29,14 @@ export default class Hub {
 		}
 	}
 
+	parseError (err: any): Promise<any> {
+		return Promise.reject(err.responseBody ? JSON.parse(err.responseBody) : err.message)
+	}
+
 	getBin (binId: string): Promise<any> {
 		return this.registry.getTwin(binId)
 			.then(resp => this.parseBinDetail(resp.responseBody))
-			.catch(err => Promise.reject(err.responseBody ? JSON.parse(err.responseBody) : err.message))
+			.catch(err => this.parseError(err))
 	}
 
 	createBin (binConfig: BinConfig): Promise<string|any> {
@@ -52,7 +56,7 @@ export default class Hub {
 	deleteBin (binId: string): Promise<boolean|any> {
 		return this.registry.delete(binId)
 			.then(() => true)
-			.catch(err => Promise.reject(err.responseBody ? JSON.parse(err.responseBody) : err.message))
+			.catch(err => this.parseError(err))
 	}
 
 	updateBinStatus (binId: string, binStatus: TypeBinStatus): Promise<boolean|any> {
@@ -62,6 +66,15 @@ export default class Hub {
 		}
 		return this.registry.update(payload)
 			.then(() => true)
-			.catch(err => Promise.reject(err.responseBody ? JSON.parse(err.responseBody) : err.message))
+			.catch(err => this.parseError(err))
+	}
+
+	updateBinTags (binId: string, binConfig: BinConfig): Promise<boolean|any> {
+		const patch = {
+			tags: { ...binConfig }
+		}
+		return this.registry.updateTwin(binId, patch, '*')
+			.then(() => true)
+			.catch(err => this.parseError(err))
 	}
 }
