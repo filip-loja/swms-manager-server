@@ -2,10 +2,12 @@
 import config from './config'
 import express from 'express'
 import bodyParser from 'body-parser'
-import Hub from './Hub'
+import AzureHub from './AzureHub'
+import AzureStorage from './AzureStorage'
 import { BinConfig } from './types'
 
-const hub = new Hub()
+const storage = new AzureStorage()
+const hub = new AzureHub(storage)
 const app = express()
 const jsonParser = bodyParser.json()
 const port = 3000

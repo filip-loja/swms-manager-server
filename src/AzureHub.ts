@@ -1,21 +1,16 @@
 
-import iotHub, { Registry } from 'azure-iothub'
 import config from './config'
-import {BinConfig, BinDetail, TypeBinStatus} from './types'
+import iotHub, { Registry } from 'azure-iothub'
+import { BinConfig, BinDetail, TypeBinStatus } from './types'
+import AzureStorage from './AzureStorage'
 
-let nextId = 5
-
-export default class Hub {
+export default class AzureHub {
 	registry: Registry
+	storage: AzureStorage
 
-	constructor () {
+	constructor (storage: AzureStorage) {
+		this.storage = storage
 		this.registry = iotHub.Registry.fromConnectionString(config.IOT_KEY)
-	}
-
-	generateId (): string {
-		const id = 'bin-' + nextId.toString().padStart(3, '0')
-		nextId++
-		return id
 	}
 
 	parseBinDetail (rawDetail: any): BinDetail {
@@ -39,8 +34,8 @@ export default class Hub {
 			.catch(err => this.parseError(err))
 	}
 
-	createBin (binConfig: BinConfig): Promise<string|any> {
-		const deviceId = this.generateId()
+	async createBin (binConfig: BinConfig): Promise<string|any> {
+		const deviceId = await this.storage.getNewId()
 		const deviceDescription = [{
 			deviceId,
 			status: 'disabled',
