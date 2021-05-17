@@ -1,0 +1,9 @@
+
+export type TypeGarbage = 'plastic' | 'paper' | 'glass' | 'metal' | 'mixed'
+
+export interface BinConfig {
+	lon: number;
+	lat: number;
+	type: TypeGarbage;
+	district?: string[];
+}

@@ -8,7 +8,8 @@
     "sourceMap": true,
     "outDir": "dist",
     "strictNullChecks": false,
-    "allowJs": true
+    "allowJs": true,
+    "noImplicitAny": false,
   },
   "baseUrl": ".",
   "paths": {
