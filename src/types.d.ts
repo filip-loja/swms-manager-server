@@ -8,3 +8,12 @@ export interface BinConfig {
 	type: TypeGarbage;
 	district?: string[];
 }
+
+export interface BinDetail {
+	id: string;
+	status: TypeBinStatus;
+	lon: number;
+	lat: number;
+	type: TypeGarbage;
+	district?: string[];
+}

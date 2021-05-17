@@ -1,7 +1,7 @@
 
 import iotHub, { Registry } from 'azure-iothub'
 import config from './config'
-import {BinConfig, TypeBinStatus} from './types'
+import {BinConfig, BinDetail, TypeBinStatus} from './types'
 
 let nextId = 5
 
@@ -16,6 +16,23 @@ export default class Hub {
 		const id = 'bin-' + nextId.toString().padStart(3, '0')
 		nextId++
 		return id
+	}
+
+	parseBinDetail (rawDetail: any): BinDetail {
+		return {
+			id: rawDetail.deviceId,
+			status: rawDetail.status,
+			lat: rawDetail.tags.lat,
+			lon: rawDetail.tags.lon,
+			type: rawDetail.tags.type,
+			district: rawDetail.tags.district
+		}
+	}
+
+	getBin (binId: string): Promise<any> {
+		return this.registry.getTwin(binId)
+			.then(resp => this.parseBinDetail(resp.responseBody))
+			.catch(err => Promise.reject(err.responseBody ? JSON.parse(err.responseBody) : err.message))
 	}
 
 	createBin (binConfig: BinConfig): Promise<string|any> {

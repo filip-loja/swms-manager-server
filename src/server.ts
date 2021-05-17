@@ -29,6 +29,13 @@ app.get('/', (req, res) => {
 	res.send('SVMS Manager<br>Created by: Filip Loja')
 })
 
+app.get('/bin/:id', (req, res) => {
+	const binId = req.params && req.params['id']
+	hub.getBin(binId)
+		.then(resp => res.json({ success: true, data: resp }))
+		.catch(error => res.status(400).json({ error }))
+})
+
 app.post('/bin/create', jsonParser, (req, res) => {
 	hub.createBin(req.body as BinConfig)
 		.then(resp => res.json({ success: true, id: resp }))
