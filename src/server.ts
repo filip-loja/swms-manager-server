@@ -29,10 +29,21 @@ app.get('/', (req, res) => {
 	res.send('SVMS Manager<br>Created by: Filip Loja')
 })
 
-app.post('/device/create', jsonParser, (req, res) => {
+app.post('/bin/create', jsonParser, (req, res) => {
 	hub.createBin(req.body as BinConfig)
 		.then(resp => res.json({ success: true, id: resp }))
-		.catch(error => res.status(403).json({ error }))
+		.catch(error => res.status(400).json({ error }))
+})
+
+app.put('/bin/status/:id', jsonParser, (req, res) => {
+	const status = req.body && req.body['status']
+	const binId = req.params && req.params['id']
+	if (!['disabled', 'enabled'].includes(status)) {
+		return res.status(400).json({ error: 'Invalid status!' })
+	}
+	hub.updateBinStatus(binId, status)
+		.then(() => res.json({ success: true }))
+		.catch(error => res.status(400).json({ error }))
 })
 
 app.listen(port, () => {

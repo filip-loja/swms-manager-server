@@ -1,7 +1,7 @@
 
 import iotHub, { Registry } from 'azure-iothub'
 import config from './config'
-import { BinConfig } from './types'
+import {BinConfig, TypeBinStatus} from './types'
 
 let nextId = 6
 
@@ -18,7 +18,7 @@ export default class Hub {
 		return id
 	}
 
-	createBin (binConfig: BinConfig): Promise<string|Record<string, string>> {
+	createBin (binConfig: BinConfig): Promise<string|any> {
 		const deviceId = this.generateId()
 		const deviceDescription = [{
 			deviceId,
@@ -30,5 +30,15 @@ export default class Hub {
 		return this.registry.addDevices(deviceDescription)
 			.then(() => deviceId)
 			.catch(err => Promise.reject(JSON.parse(err.responseBody).errors[0].errorStatus))
+	}
+
+	updateBinStatus (binId: string, binStatus: TypeBinStatus): Promise<boolean|any> {
+		const payload = {
+			deviceId: binId,
+			status: binStatus
+		}
+		return this.registry.update(payload)
+			.then(() => true)
+			.catch(err => Promise.reject(err.message))
 	}
 }
