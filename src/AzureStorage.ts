@@ -15,6 +15,7 @@ export default class AzureStorage {
 	}
 
 	saveReport (binId: string, message: string): Promise<boolean> {
+		console.log(binId, message)
 		// TODO implement
 		return Promise.resolve(true)
 	}

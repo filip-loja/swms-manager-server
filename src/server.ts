@@ -69,6 +69,21 @@ app.put('/bin/detail/:id', jsonParser, (req, res) => {
 		.catch(error => res.status(400).json({ error }))
 })
 
+app.get('/bin/fullness/:id', (req, res) => {
+	const binId = req.params && req.params['id']
+	storage.getBinFullness(binId)
+		.then(resp => res.json({ success: true, fullness: resp }))
+		.catch(error => res.status(400).json({ error }))
+})
+
+app.post('/bin/report', jsonParser, (req, res) => {
+	const id = req.body && req.body['id']
+	const message = req.body && req.body['message']
+	storage.saveReport(id, message)
+		.then(() => res.json({ success: true }))
+		.catch(error => res.status(400).json({ error }))
+})
+
 app.listen(port, () => {
 	console.log(`Server is listening at http://localhost:${port}`)
 })
