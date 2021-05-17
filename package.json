@@ -1,0 +1,25 @@
+{
+  "name": "swms-manager-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/server.js",
+    "build": "npm run clean-dist && tsc",
+    "dev": "ts-node-dev --respawn -- src/server.ts",
+    "clean-dist": "rm -rf ./dist"
+  },
+  "author": "Filip Loja",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.17.11",
+    "@typescript-eslint/eslint-plugin": "^4.24.0",
+    "@typescript-eslint/parser": "^4.24.0",
+    "ts-node-dev": "^1.1.6",
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "azure-iothub": "^1.14.0",
+    "express": "^4.17.1"
+  }
+}
