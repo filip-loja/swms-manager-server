@@ -35,6 +35,13 @@ app.post('/bin/create', jsonParser, (req, res) => {
 		.catch(error => res.status(400).json({ error }))
 })
 
+app.delete('/bin/delete/:id', (req, res) => {
+	const binId = req.params && req.params['id']
+	hub.deleteBin(binId)
+		.then(() => res.json({ success: true }))
+		.catch(error => res.status(400).json({ error }))
+})
+
 app.put('/bin/status/:id', jsonParser, (req, res) => {
 	const status = req.body && req.body['status']
 	const binId = req.params && req.params['id']

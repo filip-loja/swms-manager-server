@@ -3,7 +3,7 @@ import iotHub, { Registry } from 'azure-iothub'
 import config from './config'
 import {BinConfig, TypeBinStatus} from './types'
 
-let nextId = 6
+let nextId = 5
 
 export default class Hub {
 	registry: Registry
@@ -32,6 +32,12 @@ export default class Hub {
 			.catch(err => Promise.reject(JSON.parse(err.responseBody).errors[0].errorStatus))
 	}
 
+	deleteBin (binId: string): Promise<boolean|any> {
+		return this.registry.delete(binId)
+			.then(() => true)
+			.catch(err => Promise.reject(err.responseBody ? JSON.parse(err.responseBody) : err.message))
+	}
+
 	updateBinStatus (binId: string, binStatus: TypeBinStatus): Promise<boolean|any> {
 		const payload = {
 			deviceId: binId,
@@ -39,6 +45,6 @@ export default class Hub {
 		}
 		return this.registry.update(payload)
 			.then(() => true)
-			.catch(err => Promise.reject(err.message))
+			.catch(err => Promise.reject(err.responseBody ? JSON.parse(err.responseBody) : err.message))
 	}
 }
