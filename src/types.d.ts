@@ -17,3 +17,15 @@ export interface BinDetail {
 	type: TypeGarbage;
 	district?: string[];
 }
+
+export interface BinFilter {
+	status?: TypeBinStatus;
+	type?: TypeGarbage;
+	location?: any;
+	pageSize?: number;
+}
+
+export interface BinFilterResult {
+	items: BinDetail[];
+	nextToken?: string;
+}

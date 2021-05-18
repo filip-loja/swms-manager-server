@@ -4,7 +4,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import AzureHub from './AzureHub'
 import AzureStorage from './AzureStorage'
-import { BinConfig } from './types'
+import {BinConfig, BinFilter} from './types'
 
 const storage = new AzureStorage()
 const hub = new AzureHub(storage)
@@ -34,6 +34,12 @@ app.get('/', (req, res) => {
 app.get('/bin/:id', (req, res) => {
 	const binId = req.params && req.params['id']
 	hub.getBin(binId)
+		.then(resp => res.json({ success: true, data: resp }))
+		.catch(error => res.status(400).json({ error }))
+})
+
+app.post('/bin/list', jsonParser, (req, res) => {
+	hub.listBins(req.body as BinFilter)
 		.then(resp => res.json({ success: true, data: resp }))
 		.catch(error => res.status(400).json({ error }))
 })

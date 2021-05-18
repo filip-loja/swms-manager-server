@@ -1,8 +1,8 @@
 
 import config from './config'
-import iotHub, { Registry } from 'azure-iothub'
-import { BinConfig, BinDetail, TypeBinStatus } from './types'
 import AzureStorage from './AzureStorage'
+import iotHub, { Registry } from 'azure-iothub'
+import {BinConfig, BinDetail, BinFilter, BinFilterResult, TypeBinStatus} from './types'
 
 export default class AzureHub {
 	registry: Registry
@@ -31,6 +31,37 @@ export default class AzureHub {
 	getBin (binId: string): Promise<any> {
 		return this.registry.getTwin(binId)
 			.then(resp => this.parseBinDetail(resp.responseBody))
+			.catch(err => this.parseError(err))
+	}
+
+	listBins (filterObj: BinFilter): Promise<BinFilterResult|any> {
+		let queryStr = 'SELECT * FROM devices'
+		let joint = ' WHERE '
+		if (filterObj.status) {
+			queryStr = queryStr + joint + "status = '" + filterObj.status + "'"
+			joint = ' AND '
+		}
+		if (filterObj.type && Array.isArray(filterObj.type) && filterObj.type.length) {
+			queryStr = queryStr + joint + "tags.type IN ['" + filterObj.type.join("', '") + "']"
+			joint = ' AND '
+		}
+		if (filterObj.location) {
+			// TODO implement
+		}
+		console.log(queryStr)
+		const pageSize = (filterObj.pageSize && filterObj.pageSize > 0) ? Number(filterObj.pageSize) : 100
+		const query = this.registry.createQuery(queryStr, pageSize)
+		return query.next()
+			.then(resp => ({
+				items: resp.result
+					.map(bin => this.parseBinDetail(bin))
+					.sort((a, b) => {
+						const aNum = Number(a.id.split('-').pop())
+						const bNum = Number(b.id.split('-').pop())
+						return aNum - bNum
+					}),
+				nextToken: resp.message.headers['x-ms-continuation']
+			}))
 			.catch(err => this.parseError(err))
 	}
 
