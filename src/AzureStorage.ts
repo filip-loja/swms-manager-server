@@ -5,6 +5,7 @@ export default class AzureStorage {
 
 	getNewId (): Promise<string> {
 		// TODO implement
+		// premysliet nejaky rollback mechanizmus ak vytvaranie zlyha!
 		this.currentId++
 		return Promise.resolve('bin-' + this.currentId.toString().padStart(3, '0'))
 	}
