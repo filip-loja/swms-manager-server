@@ -2,7 +2,7 @@
 import config from './config'
 import AzureStorage from './AzureStorage'
 import iotHub, { Registry } from 'azure-iothub'
-import {BinConfig, BinDetail, BinFilter, BinFilterResult, TypeBinStatus} from './types'
+import { BinConfig, BinDetail, BinFilter, BinFilterResult, TypeBinStatus } from './types'
 
 export default class AzureHub {
 	registry: Registry
@@ -46,9 +46,12 @@ export default class AzureHub {
 			joint = ' AND '
 		}
 		if (filterObj.location) {
-			// TODO implement
+			const lonBottomLeftCheck = `tags.lon >= ${(filterObj.location.lonBottomLeft - 0.0001)}`
+			const latBottomLeftCheck = `tags.lat >= ${(filterObj.location.latBottomLeft - 0.0001)}`
+			const lonTopRightCheck = `tags.lon <= ${(filterObj.location.lonTopRight + 0.0001)}`
+			const latTopRightCheck = `tags.lat <= ${(filterObj.location.latTopRight + 0.0001)}`
+			queryStr = queryStr + joint + lonBottomLeftCheck + ' AND ' + latBottomLeftCheck + ' AND ' + lonTopRightCheck + ' AND ' + latTopRightCheck
 		}
-		console.log(queryStr)
 		const pageSize = (filterObj.pageSize && filterObj.pageSize > 0) ? Number(filterObj.pageSize) : 100
 		const query = this.registry.createQuery(queryStr, pageSize)
 		return query.next()
@@ -60,7 +63,9 @@ export default class AzureHub {
 						const bNum = Number(b.id.split('-').pop())
 						return aNum - bNum
 					}),
-				nextToken: resp.message.headers['x-ms-continuation']
+				nextToken: resp.message.headers['x-ms-continuation'],
+				query: queryStr,
+				pageSize,
 			}))
 			.catch(err => this.parseError(err))
 	}

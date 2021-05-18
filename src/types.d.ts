@@ -21,11 +21,20 @@ export interface BinDetail {
 export interface BinFilter {
 	status?: TypeBinStatus;
 	type?: TypeGarbage;
-	location?: any;
+	location?: ViewBounds;
 	pageSize?: number;
 }
 
 export interface BinFilterResult {
 	items: BinDetail[];
 	nextToken?: string;
+	query: string;
+	pageSize: number;
+}
+
+export interface ViewBounds {
+	lonBottomLeft: number;
+	latBottomLeft: number;
+	lonTopRight: number;
+	latTopRight: number;
 }
