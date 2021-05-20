@@ -8,7 +8,6 @@ import { v4 as uuid4 } from 'uuid'
 export default class AzureStorage {
 	db: Database
 	containers: Record<TypeCosmosContainer, Container>
-	currentId = 4
 
 	constructor () {
 		const client = new CosmosClient({ endpoint: config.COSMOS_ENDPOINT, key: config.COSMOS_KEY })
@@ -20,11 +19,18 @@ export default class AzureStorage {
 		}
 	}
 
-	getNewId (): Promise<string> {
-		// TODO implement
-		// premysliet nejaky rollback mechanizmus ak vytvaranie zlyha!
-		this.currentId++
-		return Promise.resolve('bin-' + this.currentId.toString().padStart(3, '0'))
+	getNewId (): Promise<any> {
+		let id: string = null
+		return this.containers.increment.item('swms-increment', 'main')
+			.read()
+			.then(({ resource }) => {
+				let increment = Number(resource.value)
+				id = 'bin-' + increment.toString().padStart(3, '0')
+				resource.value = ++increment
+				return resource
+			})
+			.then((increment) => this.containers.increment.item('swms-increment', 'main').replace(increment))
+			.then(() => id)
 	}
 
 	getBinFullness (binId: string): Promise<number> {
