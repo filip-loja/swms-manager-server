@@ -90,7 +90,8 @@ app.get('/bin/fullness/:id', (req, res) => {
 app.post('/bin/report', jsonParser, (req, res) => {
 	const id = req.body && req.body['id']
 	const message = req.body && req.body['message']
-	storage.saveReport(id, message)
+	const type = req.body && req.body['type']
+	storage.saveReport(id, type, message)
 		.then(() => success(res))
 		.catch(err => error(res, err))
 })

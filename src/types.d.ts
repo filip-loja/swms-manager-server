@@ -1,6 +1,9 @@
+import sanitizer from 'string-sanitizer'
 
 export type TypeGarbage = 'plastic' | 'paper' | 'glass' | 'metal' | 'mixed'
 export type TypeBinStatus = 'disabled' | 'enabled'
+export type TypeCosmosContainer = 'increment' | 'reports' | 'telemetry'
+export type TypeBinReportStatus = 'new' | 'opened'
 
 export interface BinConfig {
 	lon: number;
@@ -37,4 +40,13 @@ export interface ViewBounds {
 	latBottomLeft: number;
 	lonTopRight: number;
 	latTopRight: number;
+}
+
+export interface BinReport {
+	id: string;
+	binId: string;
+	type: TypeGarbage;
+	message: string;
+	status: TypeBinReportStatus;
+	[key: string]: any;
 }
