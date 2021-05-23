@@ -13,12 +13,13 @@ export interface BinConfig {
 }
 
 export interface BinDetail {
-	id: string;
+	binId: string;
 	status: TypeBinStatus;
 	lon: number;
 	lat: number;
 	type: TypeGarbage;
 	district?: string[];
+	connectionString?: string;
 }
 
 export interface BinFilter {
@@ -26,6 +27,7 @@ export interface BinFilter {
 	type?: TypeGarbage;
 	location?: ViewBounds;
 	pageSize?: number;
+	token?: string;
 }
 
 export interface BinFilterResult {

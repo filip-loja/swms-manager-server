@@ -9,7 +9,7 @@
     "outDir": "dist",
     "strictNullChecks": false,
     "allowJs": true,
-    "noImplicitAny": false,
+    "noImplicitAny": false
   },
   "baseUrl": ".",
   "paths": {

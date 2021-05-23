@@ -15,7 +15,7 @@ export default class AzureHub {
 
 	parseBinDetail (rawDetail: any): BinDetail {
 		return {
-			id: rawDetail.deviceId,
+			binId: rawDetail.deviceId,
 			status: rawDetail.status,
 			lat: rawDetail.tags.lat,
 			lon: rawDetail.tags.lon,
@@ -24,21 +24,41 @@ export default class AzureHub {
 		}
 	}
 
+	buildConnectionString (rawData: any): string {
+		const id = rawData.deviceId
+		const key = rawData.authentication.SymmetricKey.primaryKey
+		return `HostName=filipiothub.azure-devices.net;DeviceId=${id};SharedAccessKey=${key}`
+	}
+
 	parseError (err: any): Promise<any> {
 		return Promise.reject(err.responseBody ? JSON.parse(err.responseBody) : err.message)
 	}
 
 	getBin (binId: string): Promise<any> {
+		let resultObj
 		return this.registry.getTwin(binId)
-			.then(resp => this.parseBinDetail(resp.responseBody))
+			.then(resp => {
+				resultObj = this.parseBinDetail(resp.responseBody)
+				return this.registry.get(binId)
+			})
+			.then(resp => {
+				resultObj.connectionString = this.buildConnectionString(resp.responseBody)
+				return resultObj
+			})
+			.catch(err => this.parseError(err))
+	}
+
+	getBinConnectionString (bindId: string): Promise<any> {
+		return this.registry.get(bindId)
+			.then(resp => this.buildConnectionString(resp.responseBody))
 			.catch(err => this.parseError(err))
 	}
 
 	listBins (filterObj: BinFilter): Promise<BinFilterResult|any> {
 		let queryStr = 'SELECT * FROM devices'
 		let joint = ' WHERE '
-		if (filterObj.status) {
-			queryStr = queryStr + joint + "status = '" + filterObj.status + "'"
+		if (filterObj.status && Array.isArray(filterObj.status) && filterObj.status.length) {
+			queryStr = queryStr + joint + "status IN ['" + filterObj.status.join("', '") + "']"
 			joint = ' AND '
 		}
 		if (filterObj.type && Array.isArray(filterObj.type) && filterObj.type.length) {
@@ -54,13 +74,13 @@ export default class AzureHub {
 		}
 		const pageSize = (filterObj.pageSize && filterObj.pageSize > 0) ? Number(filterObj.pageSize) : 100
 		const query = this.registry.createQuery(queryStr, pageSize)
-		return query.next()
+		return query.next(filterObj.token)
 			.then(resp => ({
 				items: resp.result
 					.map(bin => this.parseBinDetail(bin))
 					.sort((a, b) => {
-						const aNum = Number(a.id.split('-').pop())
-						const bNum = Number(b.id.split('-').pop())
+						const aNum = Number(a.binId.split('-').pop())
+						const bNum = Number(b.binId.split('-').pop())
 						return aNum - bNum
 					}),
 				nextToken: resp.message.headers['x-ms-continuation'],

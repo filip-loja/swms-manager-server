@@ -43,6 +43,13 @@ app.get('/bin/:id', (req, res) => {
 		.catch(err => error(res, err))
 })
 
+app.get('/bin/:id/connection', (req, res) => {
+	const binId = req.params && req.params['id']
+	hub.getBinConnectionString(binId)
+		.then(data => success(res, data))
+		.catch(err => error(res, err))
+})
+
 app.post('/bin/list', jsonParser, (req, res) => {
 	hub.listBins(req.body as BinFilter)
 		.then(data => success(res, data))
