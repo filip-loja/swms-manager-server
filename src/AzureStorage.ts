@@ -15,7 +15,7 @@ export default class AzureStorage {
 		this.containers = {
 			increment: this.db.container('swms-increment'),
 			reports: this.db.container('swms-reports'),
-			telemetry: this.db.container('swms-increment')
+			telemetry: this.db.container('swms-telemetry')
 		}
 	}
 
@@ -33,9 +33,13 @@ export default class AzureStorage {
 			.then(() => id)
 	}
 
-	getBinFullness (binId: string): Promise<number> {
-		// TODO implement
-		return Promise.resolve(Math.random() * 100)
+	getBinFullness (binId: string): Promise<any> {
+		const querySpec = {
+			query: `SELECT top 1 * FROM c WHERE c.binId = "${binId}" ORDER BY c._ts DESC`
+		}
+		return this.containers.telemetry.items.query(querySpec).fetchAll()
+			.then(resp => resp.resources[0].fullness)
+			.catch(() => -1)
 	}
 
 	getReports () {
