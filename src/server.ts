@@ -27,6 +27,7 @@ const checkCredentials = (req, res, next) => {
 }
 
 app.use(cors())
+app.options('*', cors())
 app.use(checkCredentials)
 
 const success = (res, data = undefined) => res.json({ success: true, data })
