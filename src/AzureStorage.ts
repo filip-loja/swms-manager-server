@@ -39,7 +39,12 @@ export default class AzureStorage {
 	}
 
 	getReports () {
-		// TODO
+		const querySpec = {
+			query: 'SELECT * from c'
+		}
+		return this.containers.reports.items.query(querySpec).fetchAll()
+			.then(resp => resp.resources)
+			.catch(err => Promise.reject(err.body.message))
 	}
 
 	saveReport (binId: string, type: TypeGarbage, message: string): Promise<boolean|string> {
@@ -56,7 +61,9 @@ export default class AzureStorage {
 			.catch(err => Promise.reject(err.body.message))
 	}
 
-	updateReport () {
-		// TODO
+	deleteReport (reportId: string, key: string) {
+		return this.containers.reports.item(reportId, key).delete()
+			.then(() => Promise.resolve(true))
+			.catch(err => Promise.reject(err.body.message))
 	}
 }

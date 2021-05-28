@@ -103,6 +103,20 @@ app.post('/bin/report', jsonParser, (req, res) => {
 		.catch(err => error(res, err))
 })
 
+app.get('/bin/report/list', (req, res) => {
+	storage.getReports()
+		.then(data => success(res, data))
+		.catch(err => error(res, err))
+})
+
+app.delete('/bin/report/:id/:key', (req, res) => {
+	const reportId = req.params && req.params['id']
+	const key = req.params && req.params['key']
+	storage.deleteReport(reportId, key)
+		.then(() => success(res))
+		.catch(err => error(res, err))
+})
+
 app.listen(port, () => {
 	console.log(`Server is listening at http://localhost:${port}`)
 })
